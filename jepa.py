@@ -1,5 +1,11 @@
 """JEPA Implementation"""
 
+# jepa.py takes images + actions
+# - encodes images into latent embeddings
+# - predicts future latent embeddings under candidate actions
+# - compares predicted future to goal embedding
+# - returns a cost for each action sequence
+
 import torch
 import torch.nn.functional as F
 from einops import rearrange

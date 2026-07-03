@@ -5,6 +5,7 @@ from einops import rearrange
 
 def modulate(x, shift, scale):
     """AdaLN-zero modulation"""
+    #adjusts featuer tensor x
     return x * (1 + scale) + shift
 
 class SIGReg(torch.nn.Module):
@@ -26,6 +27,8 @@ class SIGReg(torch.nn.Module):
         """
         proj: (T, B, D)
         """
+        #computes regularisation loss
+        
         # sample random projections
         A = torch.randn(proj.size(-1), self.num_proj, device=proj.device)
         A = A.div_(A.norm(p=2, dim=0))

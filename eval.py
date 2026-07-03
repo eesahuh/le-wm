@@ -1,3 +1,4 @@
+#using a trained lewm
 import os
 
 os.environ["MUJOCO_GL"] = "egl"

@@ -1,3 +1,4 @@
+#trains the lewm world model
 import os
 from functools import partial
 from pathlib import Path
