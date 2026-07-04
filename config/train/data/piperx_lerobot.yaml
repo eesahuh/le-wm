@@ -1,0 +1,12 @@
+dataset:
+  name: piperx_lerobot
+  root: ${oc.env:PIPERX_LEROBOT_ROOT,/Users/isahe/le-wm/lerobot_data/static_eraser_pnp_v30_fps30}
+  num_steps: ${eval:'${num_preds} + ${history_size}'}
+  frame_stride: 1
+  camera_key: observation.image
+  normalize_pixels: true
+  keys_to_load:
+    - pixels
+    - action
+  keys_to_cache:
+    - action

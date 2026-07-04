@@ -1,0 +1,4 @@
+lerobot_data/
+__pycache__/
+.venv/
+outputs/

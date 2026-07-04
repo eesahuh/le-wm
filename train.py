@@ -15,6 +15,9 @@ from module import SIGReg
 from utils import get_column_normalizer, get_img_preprocessor, SaveCkptCallback
 
 
+PIPERX_LEROBOT_DATASET_NAME = "piperx_lerobot"
+
+
 def lejepa_forward(self, batch, stage, cfg):
     """encode observations, predict next states, compute losses."""
 
@@ -53,11 +56,21 @@ def run(cfg):
 
     dataset_cfg = OmegaConf.to_container(cfg.data.dataset, resolve=True)
     dataset_name = dataset_cfg.pop("name")
-    cache_dir = os.environ.get("LOCAL_DATASET_DIR", None)
-    dataset = swm.data.load_dataset(
-        dataset_name, transform=None, cache_dir=cache_dir, **dataset_cfg
-    )
-    transforms = [get_img_preprocessor(source='pixels', target='pixels', img_size=cfg.img_size)]
+    transforms = []
+
+    if dataset_name == PIPERX_LEROBOT_DATASET_NAME:
+        from piper_lerobot_dataset import PiperXLeRobotDataset
+
+        dataset_cfg.pop("keys_to_load", None)
+        dataset_cfg.pop("keys_to_cache", None)
+        dataset_cfg.setdefault("image_size", cfg.img_size)
+        dataset = PiperXLeRobotDataset(transform=None, **dataset_cfg)
+    else:
+        cache_dir = os.environ.get("LOCAL_DATASET_DIR", None)
+        dataset = swm.data.load_dataset(
+            dataset_name, transform=None, cache_dir=cache_dir, **dataset_cfg
+        )
+        transforms.append(get_img_preprocessor(source='pixels', target='pixels', img_size=cfg.img_size))
     
     with open_dict(cfg):
         for col in cfg.data.dataset.keys_to_load:
@@ -66,7 +79,10 @@ def run(cfg):
             normalizer = get_column_normalizer(dataset, col, col)
             transforms.append(normalizer)
 
-        cfg.model.action_encoder.input_dim = cfg.data.dataset.frameskip * dataset.get_dim("action")
+        if dataset_name == PIPERX_LEROBOT_DATASET_NAME:
+            cfg.model.action_encoder.input_dim = dataset.get_dim("action")
+        else:
+            cfg.model.action_encoder.input_dim = cfg.data.dataset.frameskip * dataset.get_dim("action")
 
     transform = spt.data.transforms.Compose(*transforms)
     dataset.transform = transform
