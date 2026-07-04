@@ -1,0 +1,274 @@
+{
+    "codebase_version": "v3.0",
+    "robot_type": "omy",
+    "total_episodes": 20,
+    "total_frames": 4066,
+    "total_tasks": 1,
+    "chunks_size": 1000,
+    "storage_total_chunks": 1,
+    "storage_chunk_size_episodes": 1000,
+    "fps": 30,
+    "splits": {
+        "train": "0:20"
+    },
+    "data_path": "data/chunk-{chunk_index:03d}/file-{file_index:03d}.parquet",
+    "video_path": "videos/{video_key}/chunk-{chunk_index:03d}/file-{file_index:03d}.mp4",
+    "action_source": "mux",
+    "state_history_kind": "dense_state_concat",
+    "state_history_size": 1,
+    "state_base_dim": 21,
+    "image_history_kind": "dense_image_video_copy",
+    "image_history_size": 1,
+    "image_history_offsets": {
+        "observation.image": [
+            0
+        ],
+        "observation.extra_image": [
+            0
+        ]
+    },
+    "image_history_offsets_spec": "",
+    "image_history_boundary": "clamp_to_earliest_frame",
+    "image_base_keys": [
+        "observation.image",
+        "observation.extra_image"
+    ],
+    "feature_selection": {
+        "layout": "2arm3cam",
+        "obs_selection": "1,4",
+        "obs_keys": [
+            "observation.image",
+            "observation.extra_image"
+        ],
+        "obs_base_keys": [
+            "observation.image",
+            "observation.extra_image"
+        ],
+        "obs_indices": [
+            1,
+            4
+        ],
+        "state_selection": "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21",
+        "state_indices": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21
+        ],
+        "state_base_names": [
+            "left.joint1.pos",
+            "left.joint2.pos",
+            "left.joint3.pos",
+            "left.joint4.pos",
+            "left.joint5.pos",
+            "left.joint6.pos",
+            "left.gripper.pos",
+            "left.joint1.effort_raw",
+            "left.joint2.effort_raw",
+            "left.joint3.effort_raw",
+            "left.joint4.effort_raw",
+            "left.joint5.effort_raw",
+            "left.joint6.effort_raw",
+            "left.gripper.effort_raw",
+            "left.joint1.vel",
+            "left.joint2.vel",
+            "left.joint3.vel",
+            "left.joint4.vel",
+            "left.joint5.vel",
+            "left.joint6.vel",
+            "left.gripper.vel"
+        ],
+        "action_selection": "1,2,3,4,5,6,7",
+        "action_indices": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+        ],
+        "action_names": [
+            "left.joint1.pos",
+            "left.joint2.pos",
+            "left.joint3.pos",
+            "left.joint4.pos",
+            "left.joint5.pos",
+            "left.joint6.pos",
+            "left.gripper.pos"
+        ]
+    },
+    "features": {
+        "action": {
+            "dtype": "float32",
+            "shape": [
+                7
+            ],
+            "names": [
+                "left.joint1.pos",
+                "left.joint2.pos",
+                "left.joint3.pos",
+                "left.joint4.pos",
+                "left.joint5.pos",
+                "left.joint6.pos",
+                "left.gripper.pos"
+            ],
+            "fps": 30
+        },
+        "observation.state": {
+            "dtype": "float32",
+            "shape": [
+                21
+            ],
+            "names": [
+                "left.joint1.pos",
+                "left.joint2.pos",
+                "left.joint3.pos",
+                "left.joint4.pos",
+                "left.joint5.pos",
+                "left.joint6.pos",
+                "left.gripper.pos",
+                "left.joint1.effort_raw",
+                "left.joint2.effort_raw",
+                "left.joint3.effort_raw",
+                "left.joint4.effort_raw",
+                "left.joint5.effort_raw",
+                "left.joint6.effort_raw",
+                "left.gripper.effort_raw",
+                "left.joint1.vel",
+                "left.joint2.vel",
+                "left.joint3.vel",
+                "left.joint4.vel",
+                "left.joint5.vel",
+                "left.joint6.vel",
+                "left.gripper.vel"
+            ],
+            "fps": 30
+        },
+        "timestamp": {
+            "dtype": "float32",
+            "shape": [
+                1
+            ],
+            "names": null,
+            "fps": 30
+        },
+        "frame_index": {
+            "dtype": "int64",
+            "shape": [
+                1
+            ],
+            "names": null,
+            "fps": 30
+        },
+        "episode_index": {
+            "dtype": "int64",
+            "shape": [
+                1
+            ],
+            "names": null,
+            "fps": 30
+        },
+        "index": {
+            "dtype": "int64",
+            "shape": [
+                1
+            ],
+            "names": null,
+            "fps": 30
+        },
+        "task_index": {
+            "dtype": "int64",
+            "shape": [
+                1
+            ],
+            "names": null,
+            "fps": 30
+        },
+        "observation.image": {
+            "dtype": "video",
+            "shape": [
+                256,
+                256,
+                3
+            ],
+            "names": [
+                "height",
+                "width",
+                "channels"
+            ],
+            "video_info": {
+                "video.fps": 30.0,
+                "video.height": 256,
+                "video.width": 256,
+                "video.channels": 3,
+                "video.codec": "mp4v",
+                "video.pix_fmt": "yuv420p",
+                "video.is_depth_map": false,
+                "has_audio": false
+            },
+            "info": {
+                "video.fps": 30.0,
+                "video.height": 256,
+                "video.width": 256,
+                "video.channels": 3,
+                "video.codec": "mp4v",
+                "video.pix_fmt": "yuv420p",
+                "video.is_depth_map": false,
+                "has_audio": false
+            }
+        },
+        "observation.extra_image": {
+            "dtype": "video",
+            "shape": [
+                256,
+                256,
+                3
+            ],
+            "names": [
+                "height",
+                "width",
+                "channels"
+            ],
+            "video_info": {
+                "video.fps": 30.0,
+                "video.height": 256,
+                "video.width": 256,
+                "video.channels": 3,
+                "video.codec": "mp4v",
+                "video.pix_fmt": "yuv420p",
+                "video.is_depth_map": false,
+                "has_audio": false
+            },
+            "info": {
+                "video.fps": 30.0,
+                "video.height": 256,
+                "video.width": 256,
+                "video.channels": 3,
+                "video.codec": "mp4v",
+                "video.pix_fmt": "yuv420p",
+                "video.is_depth_map": false,
+                "has_audio": false
+            }
+        }
+    },
+    "data_files_size_in_mb": 100,
+    "video_files_size_in_mb": 200
+}

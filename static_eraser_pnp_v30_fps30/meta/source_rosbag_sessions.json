@@ -1,0 +1,15 @@
+{
+  "dataset_id": "static_eraser_pnp_v30_fps30",
+  "dataset_dir": "/workspace/ros1_docker_jinhe/lerobot_data/static_eraser_pnp_v30_fps30",
+  "layout": "2arm3cam",
+  "created_at_utc": "2026-07-04T06:10:31Z",
+  "source_session_count": 1,
+  "source_sessions": [
+    {
+      "session_name": "static_eraser_pnp",
+      "session_dir": "/workspace/ros1_docker_jinhe/rosbag_data/static_eraser_pnp",
+      "episode_count": 20,
+      "source_root": "/workspace/ros1_docker_jinhe/rosbag_data"
+    }
+  ]
+}

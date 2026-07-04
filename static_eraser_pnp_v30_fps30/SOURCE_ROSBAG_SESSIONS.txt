@@ -1,0 +1,8 @@
+# Source rosbag sessions used by this LeRobot dataset
+dataset_id: static_eraser_pnp_v30_fps30
+layout: 2arm3cam
+created_at_utc: 2026-07-04T06:10:31Z
+source_session_count: 1
+
+sessions:
+1. static_eraser_pnp | episodes=20 | dir=/workspace/ros1_docker_jinhe/rosbag_data/static_eraser_pnp
