@@ -2,3 +2,5 @@ lerobot_data/
 __pycache__/
 .venv/
 outputs/
+checkpoints_from_hf/
+*.tar.gz
