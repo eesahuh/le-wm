@@ -38,6 +38,12 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--batch_size", type=int, default=16)
     parser.add_argument("--num_workers", type=int, default=4)
     parser.add_argument("--prefetch_factor", type=int, default=2)
+    parser.add_argument(
+        "--persistent_workers",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="Keep dataloader workers alive across epochs.",
+    )
     parser.add_argument("--max_epochs", type=int, default=50)
     parser.add_argument("--lr", type=float, default=1e-4)
     parser.add_argument("--weight_decay", type=float, default=1e-4)
@@ -88,6 +94,7 @@ def main() -> None:
         batch_size=args.batch_size,
         num_workers=args.num_workers,
         prefetch_factor=args.prefetch_factor,
+        persistent_workers=args.persistent_workers and not args.dry_run,
         shuffle=True,
         seed=args.seed,
         device=device,
@@ -98,6 +105,7 @@ def main() -> None:
             batch_size=args.batch_size,
             num_workers=args.num_workers,
             prefetch_factor=args.prefetch_factor,
+            persistent_workers=args.persistent_workers and not args.dry_run,
             shuffle=False,
             seed=args.seed,
             device=device,
@@ -363,6 +371,7 @@ def make_loader(
     batch_size: int,
     num_workers: int,
     prefetch_factor: int,
+    persistent_workers: bool,
     shuffle: bool,
     seed: int,
     device: torch.device,
@@ -374,7 +383,7 @@ def make_loader(
         "pin_memory": device.type == "cuda",
     }
     if num_workers > 0:
-        kwargs["persistent_workers"] = True
+        kwargs["persistent_workers"] = persistent_workers
         kwargs["prefetch_factor"] = prefetch_factor
         kwargs["multiprocessing_context"] = "spawn"
     if shuffle:
