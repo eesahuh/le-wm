@@ -1,0 +1,21 @@
+data_root: ${oc.env:PIPERX_LEROBOT_ROOT,./lerobot_data/static_eraser_pnp_v30_fps30}
+image_key: observation.image
+image_size: 224
+history_size: 10
+subgoal_offsets: [5, 10, 15, 20, 30]
+
+batch_size: 16
+num_workers: 4
+max_epochs: 50
+lr: 0.0001
+weight_decay: 0.0001
+val_split: 0.1
+seed: 3072
+
+freeze_lewm_encoder: true
+predictor_depth: 2
+predictor_heads: 4
+dropout: 0.1
+cosine_loss_weight: 0.0
+
+output_dir: outputs/subgoal_predictor
