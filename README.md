@@ -1,6 +1,6 @@
 # le-wm
 
-LeWM adapted for PiperX LeRobot training and real-robot deployment.
+LeWM adapted for Piper training and real-robot deployment.
 
 This repository started from the LeWorldModel codebase, but the checkout now
 contains the practical pieces needed to train and deploy a left-arm Piper policy:
