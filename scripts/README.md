@@ -8,6 +8,83 @@ This directory contains a minimal scripts-based workflow for using:
 
 No Docker setup is required.
 
+## Independent Piper Policy Runtime
+
+The LeWM policy server, ROS bridge, minimal robot launch, Piper controller
+package, generated Piper messages, USB camera node, and Piper Python SDK live
+in this repo. The runtime uses a clean ROS Noetic image and mounts only this
+checkout.
+
+Build the repo-owned Catkin workspace once:
+
+```bash
+cd /home/pairlab/le-wm
+scripts/build_lewm_ros_ws.sh
+```
+
+Or run the deployment TUI and step through the same workflow from one terminal:
+
+```bash
+cd /home/pairlab/le-wm
+python3 scripts/lewm_deploy_tui.py
+```
+
+Recommended order inside the TUI:
+
+1. `b` build the Catkin workspace if `ros_ws/devel/setup.bash` is missing.
+2. `r` start the robot + observation camera ROS container.
+3. `s` start the LeWM HTTP policy server.
+4. `d` start the bridge in dry-run mode and confirm camera/state/inference logs.
+5. `m` switch the left-arm command mux to `/robot/arm_left/vla_joint_cmd`.
+6. `x` start the real publishing bridge only after the dry run is healthy; the TUI requires typing `REAL`.
+
+Use `e` to edit common deployment values such as checkpoint paths, server port,
+camera topic, CAN port, and ROS Docker image. Use `l` to cycle log panes and
+`q` to stop managed processes and exit.
+
+Start the left-arm follower robot and observation USB camera stack. For the
+current side-camera-trained policy on this machine, use follower CAN `can1` and
+camera USB port `3-4`.
+
+```bash
+cd /home/pairlab/le-wm
+ROS_MASTER_URI=http://localhost:11411 \
+LEFT_CAN_PORT=can1 \
+CAMERA_OBS_USB_PORT=3-4 \
+scripts/run_piper_left_top_robot_independent.sh
+```
+
+Run the real policy flow from one second terminal. This starts or reuses the
+policy server, switches the left-arm mux to `/robot/arm_left/vla_joint_cmd`, and
+then starts the real bridge in the foreground. The bridge still holds position
+and waits for Enter before inference begins:
+
+```bash
+cd /home/pairlab/le-wm
+ROS_MASTER_URI=http://localhost:11411 scripts/run_piper_left_top_policy_real.sh
+```
+
+Dry-run the bridge from this repo inside the independent ROS container:
+
+```bash
+cd /home/pairlab/le-wm
+scripts/run_piper_left_top_bridge_independent.sh
+```
+
+Switch the left-arm mux to policy before real publishing:
+
+```bash
+docker exec -it lewm_ros_runtime bash -lc \
+  'source /opt/ros/noetic/setup.bash && source /workspace/le-wm/ros_ws/devel/setup.bash && rosservice call /robot/arm_left/joint_cmd_mux_select /robot/arm_left/vla_joint_cmd'
+```
+
+The bridge defaults to dry-run mode. Set `EXECUTE_REAL=1` only when the robot,
+camera stream, mux selection, and safety checks are ready:
+
+```bash
+EXECUTE_REAL=1 scripts/run_piper_left_top_bridge_independent.sh
+```
+
 ## Laptop
 
 ```bash
