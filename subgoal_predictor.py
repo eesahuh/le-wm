@@ -209,7 +209,9 @@ def build_random_lewm_for_smoke(
 def _load_stable_worldmodel_checkpoint(checkpoint_path: Path) -> nn.Module:
     import stable_worldmodel as swm
 
-    return swm.wm.utils.load_pretrained(str(checkpoint_path))
+    # stable_worldmodel resolves relative paths under ~/.stable_worldmodel/checkpoints.
+    # Resolve first so repo-local checkpoint paths keep pointing at the repo.
+    return swm.wm.utils.load_pretrained(str(checkpoint_path.expanduser().resolve()))
 
 
 def _load_lightning_checkpoint(
