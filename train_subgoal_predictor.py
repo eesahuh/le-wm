@@ -37,6 +37,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--image_size", type=int, default=224)
     parser.add_argument("--batch_size", type=int, default=16)
     parser.add_argument("--num_workers", type=int, default=4)
+    parser.add_argument("--prefetch_factor", type=int, default=2)
     parser.add_argument("--max_epochs", type=int, default=50)
     parser.add_argument("--lr", type=float, default=1e-4)
     parser.add_argument("--weight_decay", type=float, default=1e-4)
@@ -50,6 +51,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--output_dir", default="outputs/subgoal_predictor")
     parser.add_argument("--video_backend", default="auto")
     parser.add_argument("--limit_train_batches", type=int, default=None)
+    parser.add_argument("--log_every_batches", type=int, default=25)
     parser.add_argument("--dry_run", action="store_true", help="Run one forward/backward step and exit")
     parser.add_argument(
         "--allow_random_lewm",
@@ -85,6 +87,7 @@ def main() -> None:
         train_set,
         batch_size=args.batch_size,
         num_workers=args.num_workers,
+        prefetch_factor=args.prefetch_factor,
         shuffle=True,
         seed=args.seed,
         device=device,
@@ -94,6 +97,7 @@ def main() -> None:
             val_set,
             batch_size=args.batch_size,
             num_workers=args.num_workers,
+            prefetch_factor=args.prefetch_factor,
             shuffle=False,
             seed=args.seed,
             device=device,
@@ -141,6 +145,7 @@ def main() -> None:
             freeze_lewm_encoder=args.freeze_lewm_encoder,
             cosine_loss_weight=args.cosine_loss_weight,
             limit_batches=1,
+            log_every_batches=1,
         )
         print(f"[subgoal] dry_run train_loss={metrics['loss']:.6f}")
         print("[subgoal] one forward/backward step passed")
@@ -162,6 +167,7 @@ def main() -> None:
             freeze_lewm_encoder=args.freeze_lewm_encoder,
             cosine_loss_weight=args.cosine_loss_weight,
             limit_batches=args.limit_train_batches,
+            log_every_batches=args.log_every_batches,
         )
         val_metrics = (
             evaluate(
@@ -227,6 +233,7 @@ def train_one_epoch(
     freeze_lewm_encoder: bool,
     cosine_loss_weight: float,
     limit_batches: Optional[int] = None,
+    log_every_batches: int = 25,
 ) -> Dict[str, float]:
     predictor.train()
     if freeze_lewm_encoder:
@@ -236,6 +243,10 @@ def train_one_epoch(
 
     totals = {"loss": 0.0, "mse_loss": 0.0, "cosine_loss": 0.0}
     count = 0
+    start_time = time.time()
+    total_batches = len(loader)
+    if limit_batches is not None:
+        total_batches = min(total_batches, limit_batches)
     for batch_idx, batch in enumerate(loader):
         if limit_batches is not None and batch_idx >= limit_batches:
             break
@@ -256,6 +267,21 @@ def train_one_epoch(
         for key in totals:
             totals[key] += float(metrics[key])
         count += 1
+
+        should_log = log_every_batches > 0 and (
+            count == 1 or count % log_every_batches == 0 or count == total_batches
+        )
+        if should_log:
+            elapsed = time.time() - start_time
+            batches_per_sec = count / max(elapsed, 1e-6)
+            print(
+                "[subgoal] "
+                f"batch {count}/{total_batches} "
+                f"loss={float(metrics['loss']):.6f} "
+                f"avg_loss={totals['loss'] / max(count, 1):.6f} "
+                f"{batches_per_sec:.3f} batch/s",
+                flush=True,
+            )
 
     return {key: value / max(count, 1) for key, value in totals.items()}
 
@@ -336,6 +362,7 @@ def make_loader(
     *,
     batch_size: int,
     num_workers: int,
+    prefetch_factor: int,
     shuffle: bool,
     seed: int,
     device: torch.device,
@@ -348,7 +375,8 @@ def make_loader(
     }
     if num_workers > 0:
         kwargs["persistent_workers"] = True
-        kwargs["prefetch_factor"] = 2
+        kwargs["prefetch_factor"] = prefetch_factor
+        kwargs["multiprocessing_context"] = "spawn"
     if shuffle:
         kwargs["generator"] = torch.Generator().manual_seed(seed)
     return DataLoader(dataset, **kwargs)
